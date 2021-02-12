@@ -1,0 +1,6 @@
+{
+  "scripts": {
+    "push": "clasp push",
+    "pull": "clasp pull"
+  }
+}

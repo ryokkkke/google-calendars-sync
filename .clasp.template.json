@@ -1,0 +1,10 @@
+{
+  "scriptId": "your-script-id",
+  "filePushOrder": [
+    "src/variables.js",
+    "src/next-sync-token.js",
+    "src/updated-calendar-event.js",
+    "src/block-event.js",
+    "src/handler.js"
+  ]
+}

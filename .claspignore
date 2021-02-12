@@ -1,0 +1,4 @@
+**/**
+!src/**/*.js
+src/variables.template.js
+!appsscript.json
