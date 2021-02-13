@@ -1,3 +1,5 @@
+const nextSyncTokenKeyPrefix = 'NEXT_SYNC_TOKEN_';
+
 class NextSyncToken {
   constructor(calendarId) {
     this.calendarId = calendarId;

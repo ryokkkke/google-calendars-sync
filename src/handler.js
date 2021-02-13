@@ -1,16 +1,13 @@
 const scriptProperties = PropertiesService.getScriptProperties();
-const nextSyncTokenKeyPrefix = 'NEXT_SYNC_TOKEN_';
-const blockEventIdKeyPrefix = "BLOCK_EVENT_ID_BY_";
-const generateBlockEventIdKey = (originalEventId) => `${blockEventIdKeyPrefix}${originalEventId}`;
 
-const onUpdateCalendar = (updateEvent) => {
+const onUpdateCalendarHandler = (updateEvent) => {
   const updatedCalendarId = updateEvent.calendarId;
-  const originalEventGuestCalendar = calendars.find((calendar) => calendar.id === updatedCalendarId);
+  const originalEventGuestCalendar = calendarPropertiesList.find((calendarProperties) => calendarProperties.id === updatedCalendarId);
   if (originalEventGuestCalendar == undefined) return console.log("this update event is not a target.");
   
-  const targetCalendars = calendars.filter((calendar) => calendar.id !== updatedCalendarId);
-  if (targetCalendars.length === 0) return console.log("no target calendars.");
-  
+  const targetCalendarPropertiesList = calendarPropertiesList.filter((calendarProperties) => calendarProperties.id !== updatedCalendarId);
+  if (targetCalendarPropertiesList.length === 0) return console.log("no target calendars.");
+
   // 変更のあった予定を取得
   const nextSyncToken = new NextSyncToken(updatedCalendarId);
   const option = { syncToken: nextSyncToken.get() };
@@ -22,15 +19,9 @@ const onUpdateCalendar = (updateEvent) => {
       const updatedCalendarEvent = new UpdatedCalendarEvent(originalEventGuestCalendar.email, item);
       
       // 終日の予定は無視
-      if (updatedCalendarEvent.isAllDay) {
-        console.log("ignoring an all day event.");
-        return;
-      }
+      if (updatedCalendarEvent.isAllDay) return console.log("ignoring an all day event.");
 
-      targetCalendars.forEach((calendar) => {
-        const calendarId = calendar.id;
-        const targetCalendar = CalendarApp.getCalendarById(calendarId);
-
+      targetCalendarPropertiesList.forEach((targetCalendarProperties) => {
         // 同じ時間帯のブロック予定を削除
         // -- 予定が削除された場合
         // -- 「参加：いいえ」の場合
@@ -39,7 +30,8 @@ const onUpdateCalendar = (updateEvent) => {
           // オリジナル予定との紐付けデータはゴミデータになるが許容する（値からキーを検索する処理を追加すると煩雑になるので）
           if (updatedCalendarEvent.isBlockEvent) return console.log("the deleted event was a block event.");
 
-          const blockEvent = updatedCalendarEvent.getBlockEventFromCalendar(targetCalendar);
+          const targetCalendar = CalendarApp.getCalendarById(targetCalendarProperties.id);
+          const blockEvent = updatedCalendarEvent.fetchBlockEventFromCalendar(targetCalendar);
           if (blockEvent == undefined) return;
 
           blockEvent.delete();
@@ -48,18 +40,16 @@ const onUpdateCalendar = (updateEvent) => {
 
         // 同じ時間帯にブロック予定を作成
         // -- 参加でなければ終了
-        if (!updatedCalendarEvent.isAttend) return;
+        if (!updatedCalendarEvent.isAttend) return console.log("this is not an event which is planned to attend.");
         // -- 既にブロックイベントが存在する場合は作成しない
-        const blockEvent = updatedCalendarEvent.getBlockEventFromCalendar(targetCalendar);
-        if (blockEvent && blockEvent.exists()) return;
+        const targetCalendar = CalendarApp.getCalendarById(targetCalendarProperties.id);
+        const blockEvent = updatedCalendarEvent.fetchBlockEventFromCalendar(targetCalendar);
+        if (blockEvent != undefined) return console.log("a block event already exists.");
 
         // ブロックイベントの作成
         const summary = generateBlockEventSummary(updatedCalendarId);
-        const createdBlockEvent = updatedCalendarEvent.createBlockEvent(targetCalendar, summary);
-
-        // オリジナル予定のIDとブロック予定のIDを紐づける
-        createdBlockEvent.register();
-        console.log(`created a block event on ${item.start.dateTime} - ${item.end.dateTime}`);
+        updatedCalendarEvent.createBlockEvent(targetCalendar, summary);
+        console.log(`created a block event.`);
       });
     });
   } finally {

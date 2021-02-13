@@ -1,9 +1,4 @@
 class UpdatedCalendarEvent {
-  static getBlockEventIds() {
-    const blockEventIdKeys = scriptProperties.getKeys().filter((key) => key.startsWith(blockEventIdKeyPrefix));
-    return blockEventIdKeys.map((key) => scriptProperties.getProperty(key));
-  }
-
   constructor(userEmail, calendarEvent) {
     this.userEmail = userEmail;
     this.calendarEvent = calendarEvent;
@@ -22,8 +17,13 @@ class UpdatedCalendarEvent {
     if (!this.isConfirmed) return false;
     return this.calendarEvent.start.date != undefined;
   }
+
+  get isOwned() {
+    return this.calendarEvent.creator.email === this.userEmail;
+  }
   
   get isAttend() {
+    if (this.isOwned) return true;
     if (!this.isConfirmed) return false;
     
     const guest = this.getGuest(this.userEmail);
@@ -39,7 +39,7 @@ class UpdatedCalendarEvent {
   
   get isBlockEvent() {
     // なぜかevent.getId()で返ってくるidには"@google.com"がつくので、検索時にも付与する
-    return UpdatedCalendarEvent.getBlockEventIds().includes(`${this.calendarEvent.id}@google.com`);
+    return BlockEvent.getBlockEventIds().includes(`${this.calendarEvent.id}@google.com`);
   }
 
   getGuest() {
@@ -53,23 +53,19 @@ class UpdatedCalendarEvent {
 
   // 削除した予定はIDしか取得できず、同じ時間帯の予定を探すことができない
   // ブロックイベントの作成時にオリジナルのIDとブロックイベントのIDをセットで保存しておき、後にオリジナルのIDからブロックイベントのIDを取得できるようにする
-  getBlockEventFromCalendar(calendar) {
-    const propertyKey = generateBlockEventIdKey(this.calendarEvent.id);
-    const property = scriptProperties.getProperty(propertyKey);
-    const blockEventId = property && property.split(":::::")[0];
-    if (blockEventId == undefined) return console.log("couldn't find blockEventId.");
-
-    const event = calendar.getEventById(blockEventId);
-    if (event == undefined) return console.log("couldn't find blockEvent.");
-
-    return new BlockEvent(event, propertyKey);
+  fetchBlockEventFromCalendar(calendar) {
+    return BlockEvent.fetchFromCalendar(calendar, this.calendarEvent);
   }
 
   createBlockEvent(calendar, summary) {
     const event = calendar
       .createEvent(summary, new Date(this.calendarEvent.start.dateTime), new Date(this.calendarEvent.end.dateTime))
       .setVisibility(CalendarApp.Visibility.PRIVATE);
+    const blockEvent = new BlockEvent(event, this.calendarEvent);
     
-    return new BlockEvent(event, this.calendarEvent);
+    // オリジナル予定のIDとブロック予定のIDを紐づける
+    blockEvent.register();
+
+    return blockEvent;
   }
 }
