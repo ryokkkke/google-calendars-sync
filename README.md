@@ -26,6 +26,22 @@ https://developers.google.com/apps-script/advanced/calendar
 
 # デプロイ方法
 
+[clasp](https://github.com/google/clasp) コマンドが必要。
+`$ npm install -g @google/clasp` でインストール。
+
+## なんとなく自動
+
+1. このレポジトリをクローンする。
+2. `$ bin/configure` を叩く。
+  - 初回はデプロイするアカウントでログイン。
+3. 生成される `src/variables.js` の `calendars` の id と email を埋める。カレンダーの id はカレンダーの設定画面から確認できる。
+4.  `$ npm run push` してスクリプトを更新。
+5.  ブラウザで該当のスクリプトのページを開き、左のメニューの「サービス」の + を押し、Google Calendar API を選択。v3でのみ動作確認済み。
+6.  ブラウザ上の右上の「デプロイ > 新しいデプロイ」を選択。
+7. 種類を「ウェブアプリ」にしてデプロイ。
+
+## 手動
+
 1.  このレポジトリをクローンする。
 2.  https://script.google.com にアクセスし、デプロイするGoogleアカウントでログイン。
 3.  「新しいプロジェクト」ボタンを押し、URL の中のスクリプトIDをコピー。

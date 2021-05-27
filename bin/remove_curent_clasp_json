@@ -1,0 +1,14 @@
+#!/bin/bash
+
+echo "============================="
+cat .clasp.json
+echo "============================="
+
+echo -n "are you sure to remove .clasp.json? (type \"YES\" to continue):"
+read reply
+if [ "$reply" != "YES" ]; then
+  echo "aborted."
+  exit 1
+fi
+
+rm .clasp.json

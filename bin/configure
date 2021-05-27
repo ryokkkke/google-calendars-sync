@@ -1,0 +1,32 @@
+#!/bin/bash
+
+if [ ! -f $HOME/.clasprc.json ]; then
+  clasp login
+fi
+
+echo "creating new script..."
+clasp create --type webapp --title "Calendars Sync Test" | tee tmp_file_so_delete_me
+
+result=$(cat tmp_file_so_delete_me)
+rm tmp_file_so_delete_me
+
+tmp=${result%/*}
+script_id=${tmp##*/}
+
+echo ""
+echo "SCRIPT_ID: $script_id"
+
+# 自前のテンプレートからコピーしてスクリプトIDを上書き
+cp .clasp.template.json .clasp.json
+sed -i "" "s/your-script-id/$script_id/" .clasp.json
+
+echo ""
+echo "overwrote .clasp.json"
+
+# 無ければ変数ファイルをコピー
+if [ ! -f src/variables.js ]; then
+  cp src/variables.template.js src/variables.js
+
+  echo ""
+  echo "edit the copied \"src/variables.js\"."
+fi
