@@ -23,7 +23,7 @@ const generateBlockEventSummary = (updatedCalendarId) => `${blockEventSummaryPre
 
 // オリジナルイベントとブロックイベントの紐付きデータをScriptPropertiesに保存しているが、容量制限があるはずなので一定数たまったら古いものを削除する
 // 古いオリジナル予定が削除されたときにブロック予定が削除されないことになるが、古い予定に関してはそうなっても良いと判断
-// -- 1日に入る予定数を決め、nヶ月分は保存しておく。
+// -- 1日に入る予定数を決め、nヶ月分は保存しておく。READMEに記載したように、キーバリューのペアは2500までに抑えると良さそう。
 const eventsPerDay = 20;
 const limitMonth = 2;
 const limitDays = limitMonth * 30;
