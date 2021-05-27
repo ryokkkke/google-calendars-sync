@@ -42,6 +42,14 @@ class UpdatedCalendarEvent {
     return BlockEvent.getBlockEventIds().includes(`${this.calendarEvent.id}@google.com`);
   }
 
+  get startTime() {
+    return this.calendarEvent.getStartTime();
+  }
+
+  get endTime() {
+    return this.calendarEvent.getEndTime();
+  }
+
   getGuest() {
     if (!this.cachedGuests.hasOwnProperty(this.userEmail)) {
       const guest = this.calendarEvent.attendees && this.calendarEvent.attendees.find((_guest) => _guest.email === this.userEmail);
@@ -67,5 +75,15 @@ class UpdatedCalendarEvent {
     blockEvent.register();
 
     return blockEvent;
+  }
+
+  getTimePair() {
+    return [this.startTime.getTime(), this.endTime.getTime()];
+  }
+
+  isSameTime(blockEvent) {
+    const timePair = this.getTimePair();
+    const blockEventTimePair = blockEvent.getTimePair();
+    return timePair[0] === blockEventTimePair[0] && timePair[1] === blockEventTimePair[1];
   }
 }

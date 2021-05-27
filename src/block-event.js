@@ -87,4 +87,12 @@ class BlockEvent {
       return false;
     }
   }
+
+  getTimePair() {
+    return [this.calendarEvent.getStartTime().getTime(), this.calendarEvent.getEndTime().getTime()];
+  }
+
+  updateTime(startTime, endTime) {
+    this.calendarEvent.setTime(startTime, endTime);
+  }
 }

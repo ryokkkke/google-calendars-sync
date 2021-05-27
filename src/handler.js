@@ -44,7 +44,13 @@ const onUpdateCalendarHandler = (updateEvent) => {
         // -- 既にブロックイベントが存在する場合は作成しない
         const targetCalendar = CalendarApp.getCalendarById(targetCalendarProperties.id);
         const blockEvent = updatedCalendarEvent.fetchBlockEventFromCalendar(targetCalendar);
-        if (blockEvent != undefined) return console.log("a block event already exists.");
+        if (blockEvent != undefined) {
+          if (updatedCalendarEvent.isSameTime(blockEvent)) return console.log("a block event already exists.");
+
+          // 時間が変更されている場合はブロックイベントの時間を変更する
+          blockEvent.updateTime(updatedCalendarEvent.startTime, updatedCalendarEvent.endTime);
+          return console.log("updated the block event startTime and endTime.");
+        }
 
         // ブロックイベントの作成
         const summary = generateBlockEventSummary(updatedCalendarId);
