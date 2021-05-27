@@ -36,7 +36,7 @@ https://developers.google.com/apps-script/advanced/calendar
   - 初回はデプロイするアカウントでログイン。
 3. 生成される `src/variables.js` の `calendars` の id と email を埋める。カレンダーの id はカレンダーの設定画面から確認できる。
 4.  `$ npm run push` してスクリプトを更新。
-5.  ブラウザで該当のスクリプトのページを開き、左のメニューの「サービス」の + を押し、Google Calendar API を選択。v3でのみ動作確認済み。
+5.  `$ SCRIPT_ID=xxx ./bin/open_web_editor` で該当のスクリプトのページを開き、左のメニューの「サービス」の + を押し、Google Calendar API を選択。v3でのみ動作確認済み。
 6.  ブラウザ上の右上の「デプロイ > 新しいデプロイ」を選択。
 7. 種類を「ウェブアプリ」にしてデプロイ。
 
@@ -49,7 +49,7 @@ https://developers.google.com/apps-script/advanced/calendar
 5.  `$ cp src/variables.template.js src/variables.js` して、 `calendars` の id と email を埋める。カレンダーの id はカレンダーの設定画面から確認できる。
 6.  `$ clasp login` して、デプロイするGoogleアカウントでログイン。
 7.  `$ npm run push` してスクリプトを更新。
-8.  ブラウザで該当のスクリプトのページを開き、左のメニューの「サービス」の + を押し、Google Calendar API を選択。v3でのみ動作確認済み。
+5.  `$ SCRIPT_ID=xxx ./bin/open_web_editor` で該当のスクリプトのページを開き、左のメニューの「サービス」の + を押し、Google Calendar API を選択。v3でのみ動作確認済み。
 9.  ブラウザ上の右上の「デプロイ > 新しいデプロイ」を選択。
 10. 種類を「ウェブアプリ」にしてデプロイ。
 

@@ -1,0 +1,3 @@
+#!/bin/bash
+
+open https://script.google.com/d/${SCRIPT_ID:?}/edit
