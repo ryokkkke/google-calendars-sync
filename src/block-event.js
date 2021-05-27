@@ -92,6 +92,7 @@ class BlockEvent {
     return [this.calendarEvent.getStartTime().getTime(), this.calendarEvent.getEndTime().getTime()];
   }
 
+  // arguments: Date, Date
   updateTime(startTime, endTime) {
     this.calendarEvent.setTime(startTime, endTime);
   }

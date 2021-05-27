@@ -1,25 +1,27 @@
 class UpdatedCalendarEvent {
-  constructor(userEmail, calendarEvent) {
+  // ここで渡ってくるcalendarEventはドキュメントに出てくるCalendarEventではない。
+  // https://developers.google.com/apps-script/advanced/calendar#listing_events に出てくる、ドキュメントの無いオブジェクト...
+  constructor(userEmail, advancedCalendarEvent) {
     this.userEmail = userEmail;
-    this.calendarEvent = calendarEvent;
+    this.advancedCalendarEvent = advancedCalendarEvent;
     this.cachedGuests = {};
   }
 
   get isConfirmed() {
-    return this.calendarEvent.status === "confirmed";
+    return this.advancedCalendarEvent.status === "confirmed";
   }
 
   get isDeleted() {
-    return this.calendarEvent.status === "cancelled";
+    return this.advancedCalendarEvent.status === "cancelled";
   }
 
   get isAllDay() {
     if (!this.isConfirmed) return false;
-    return this.calendarEvent.start.date != undefined;
+    return this.advancedCalendarEvent.start.date != undefined;
   }
 
   get isOwned() {
-    return this.calendarEvent.creator.email === this.userEmail;
+    return this.advancedCalendarEvent.creator.email === this.userEmail;
   }
   
   get isAttend() {
@@ -39,20 +41,20 @@ class UpdatedCalendarEvent {
   
   get isBlockEvent() {
     // なぜかevent.getId()で返ってくるidには"@google.com"がつくので、検索時にも付与する
-    return BlockEvent.getBlockEventIds().includes(`${this.calendarEvent.id}@google.com`);
+    return BlockEvent.getBlockEventIds().includes(`${this.advancedCalendarEvent.id}@google.com`);
   }
 
   get startTime() {
-    return this.calendarEvent.getStartTime();
+    return new Date(this.advancedCalendarEvent.start.dateTime);
   }
 
   get endTime() {
-    return this.calendarEvent.getEndTime();
+    return new Date(this.advancedCalendarEvent.end.dateTime);
   }
 
   getGuest() {
     if (!this.cachedGuests.hasOwnProperty(this.userEmail)) {
-      const guest = this.calendarEvent.attendees && this.calendarEvent.attendees.find((_guest) => _guest.email === this.userEmail);
+      const guest = this.advancedCalendarEvent.attendees && this.advancedCalendarEvent.attendees.find((_guest) => _guest.email === this.userEmail);
       this.cachedGuests[this.userEmail] = guest;
     }
 
@@ -62,14 +64,14 @@ class UpdatedCalendarEvent {
   // 削除した予定はIDしか取得できず、同じ時間帯の予定を探すことができない
   // ブロックイベントの作成時にオリジナルのIDとブロックイベントのIDをセットで保存しておき、後にオリジナルのIDからブロックイベントのIDを取得できるようにする
   fetchBlockEventFromCalendar(calendar) {
-    return BlockEvent.fetchFromCalendar(calendar, this.calendarEvent);
+    return BlockEvent.fetchFromCalendar(calendar, this.advancedCalendarEvent);
   }
 
   createBlockEvent(calendar, summary) {
     const event = calendar
-      .createEvent(summary, new Date(this.calendarEvent.start.dateTime), new Date(this.calendarEvent.end.dateTime))
+      .createEvent(summary, this.startTime, this.endTime)
       .setVisibility(CalendarApp.Visibility.PRIVATE);
-    const blockEvent = new BlockEvent(event, this.calendarEvent);
+    const blockEvent = new BlockEvent(event, this.advancedCalendarEvent);
     
     // オリジナル予定のIDとブロック予定のIDを紐づける
     blockEvent.register();
@@ -81,6 +83,7 @@ class UpdatedCalendarEvent {
     return [this.startTime.getTime(), this.endTime.getTime()];
   }
 
+  // arguments: BlockEvent
   isSameTime(blockEvent) {
     const timePair = this.getTimePair();
     const blockEventTimePair = blockEvent.getTimePair();
