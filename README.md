@@ -29,6 +29,9 @@ https://developers.google.com/apps-script/advanced/calendar
 [clasp](https://github.com/google/clasp) コマンドが必要。
 `$ npm install -g @google/clasp` でインストール。
 
+- シェアするカレンダー同士は、互いに「予定の変更」以上の権限を持つように設定する。
+- 全アカウント分のトリガーを作成するので、デプロイは一つでOK。
+
 ## なんとなく自動
 
 1. このレポジトリをクローンする。
@@ -39,6 +42,7 @@ https://developers.google.com/apps-script/advanced/calendar
 5.  `$ SCRIPT_ID=xxx ./bin/open_web_editor` で該当のスクリプトのページを開き、左のメニューの「サービス」の + を押し、Google Calendar API を選択。v3でのみ動作確認済み。
 6.  ブラウザ上の右上の「デプロイ > 新しいデプロイ」を選択。
 7. 種類を「ウェブアプリ」にしてデプロイ。
+8. トリガータブの中でシェアするカレンダー全てのトリガーを作成。
 
 ## 手動
 
@@ -52,6 +56,7 @@ https://developers.google.com/apps-script/advanced/calendar
 5.  `$ SCRIPT_ID=xxx ./bin/open_web_editor` で該当のスクリプトのページを開き、左のメニューの「サービス」の + を押し、Google Calendar API を選択。v3でのみ動作確認済み。
 9.  ブラウザ上の右上の「デプロイ > 新しいデプロイ」を選択。
 10. 種類を「ウェブアプリ」にしてデプロイ。
+11. トリガータブの中でシェアするカレンダー全てのトリガーを作成。
 
 # 修正方法
 

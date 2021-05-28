@@ -1,0 +1,66 @@
+#!/bin/bash
+
+function command_check() {
+  local command=$1
+  if [ `which $command` ]; then
+    echo $command
+  fi
+}
+
+# claspあれば終了
+if [ "$(command_check clasp)" != "" ]; then
+  echo "clasp ✅"
+  clasp -v
+  exit 0
+else
+  echo "clasp missing ⚠️"
+fi
+
+# nodeが無ければインストール
+# 本当はnodenv（anyenv）とか使う方がいいけどプログラミングするわけじゃないのでここではbrewから直接インストールする
+if [ "$(command_check node)" = "" ]; then
+  echo "node missing ⚠️"
+
+  if [ "$(command_check brew)" = "" ]; then
+    echo "brew missing ⚠️"
+    # PATHの追加必要かも？
+    # echo 'export PATH="/usr/local/bin:$PATH"' >> .bash_profile
+    echo -n 'install brew ? (type "yes" to continue): '
+    read answer
+    if [ "$answer" = "yes" ]; then
+      echo "installing brew..."
+      exec /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    else
+      echo "canceled"
+      exit 1
+    fi
+  else
+    echo "brew ✅"
+    brew -v
+
+    # PATHの追加必要かも？
+    echo -n 'install node ? (type "yes" to continue): '
+    read answer
+    if [ "$answer" = "yes" ]; then
+      echo "installing node..."
+      exec brew install node
+    else
+      echo "canceled"
+      exit 1
+    fi
+  fi
+
+else
+  echo "node ✅"
+  node -v
+
+  # PATHの追加必要かも？
+  echo -n 'install clasp ? (type "yes" to continue): '
+  read answer
+  if [ "$answer" = "yes" ]; then
+    exec npm install -g @google/clasp
+  else
+    echo "canceled"
+    exit 1
+  fi
+fi
