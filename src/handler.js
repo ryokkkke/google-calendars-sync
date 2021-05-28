@@ -21,15 +21,15 @@ const onUpdateCalendarHandler = (updateEvent) => {
       // 終日の予定は無視
       if (updatedCalendarEvent.isAllDay) return console.log("ignoring an all day event.");
 
+      // 変更された予定がブロックイベントの場合は無視
+      // -- ブロックイベントだけ削除された場合は、オリジナル予定との紐付けデータがゴミデータになるが許容する（値からキーを検索する処理を追加すると煩雑になるので）
+      if (updatedCalendarEvent.isBlockEvent) return console.log("the updated event was a block event.");
+
       targetCalendarPropertiesList.forEach((targetCalendarProperties) => {
         // 同じ時間帯のブロック予定を削除
         // -- 予定が削除された場合
         // -- 「参加：いいえ」の場合
         if (updatedCalendarEvent.isDeleted || updatedCalendarEvent.isDeclined) {
-          // 削除した予定がブロックイベントの場合は何もしない
-          // オリジナル予定との紐付けデータはゴミデータになるが許容する（値からキーを検索する処理を追加すると煩雑になるので）
-          if (updatedCalendarEvent.isBlockEvent) return console.log("the deleted event was a block event.");
-
           const targetCalendar = CalendarApp.getCalendarById(targetCalendarProperties.id);
           const blockEvent = updatedCalendarEvent.fetchBlockEventFromCalendar(targetCalendar);
           if (blockEvent == undefined) return;

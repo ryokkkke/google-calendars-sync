@@ -41,6 +41,9 @@ class UpdatedCalendarEvent {
   
   get isBlockEvent() {
     // なぜかevent.getId()で返ってくるidには"@google.com"がつくので、検索時にも付与する
+    // -- 削除した予定はIDしか取得できないので、summaryとprefixの一致では判断ができない
+    // -- 更新された予定はsummaryがとれるので、prefixとの一致判定も一応入れておく
+    if (this.advancedCalendarEvent.summary != undefined && this.advancedCalendarEvent.summary.startsWith(blockEventSummaryPrefix)) return true;
     return BlockEvent.getBlockEventIds().includes(`${this.advancedCalendarEvent.id}@google.com`);
   }
 
